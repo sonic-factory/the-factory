@@ -33,7 +33,7 @@ The Factory uses a **Clone Factory Pattern** for gas-efficient deployments:
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Factory        │───▶│  Implementation  │◄───│  Clone 1        │
+│  Factory        │───>│  Implementation  │<───│  Clone 1        │
 │  Contract       │    │  Contract        │    │  (User Token)   │
 │                 │    │                  │    │                 │
 │  • Clone logic  │    │  • Business      │    ├─────────────────┤
