@@ -1,0 +1,29 @@
+Business Source License 1.1
+
+Licensor: Sonic Factory (https://www.sonicfactory.dev/)
+License Type: Source-Available
+Change Date: 2035-01-01
+Change License: GNU General Public License v2.0 or later (GPL-2.0-or-later)
+
+Licensed Work: The code in this repository at https://github.com/sonic-factory
+
+Usage Limitation:
+Use of the Licensed Work in a production or commercial environment (including but not limited to running as a Software-as-a-Service or integrating into paid products) requires a separate commercial license from the Licensor.
+
+You may use, modify, and distribute this code for development and testing purposes only, subject to the terms below.
+
+Additional Terms:
+
+1. Contribution Notice:
+   All modifications or derivative works must be reported to the Licensor by opening a pull request on the official GitHub repository or emailing hello@sonicfactory.dev.
+
+2. Trademark and Branding:
+   "Sonic Factory", the Sonic Factory logo, and associated branding are trademarks of the Licensor. You may not use these marks, or create derivatives that may cause confusion with Sonic Factory, without explicit written permission.
+
+3. Commercial License:
+   For commercial use (e.g., SaaS, enterprise integration, or resale), contact us for a commercial license at hello@sonicfactory.dev or visit https://www.sonicfactory.dev/license
+
+This License will convert to the Change License specified above on the Change Date.
+
+For full details, refer to the official BSL 1.1 at: https://mariadb.com/bsl11
+
