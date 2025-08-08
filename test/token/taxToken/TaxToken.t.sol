@@ -4,8 +4,8 @@ pragma solidity 0.8.28;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "../../../src/token/taxToken/TaxToken.sol";
-import "../../../src/token/taxToken/TaxTokenFactory.sol";
+import "@taxToken/TaxToken.sol";
+import "@taxToken/TaxTokenFactory.sol";
 
 contract TaxTokenTest is Test {
 

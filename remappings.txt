@@ -1,1 +1,6 @@
 @openzeppelin/=node_modules/@openzeppelin
+@standardERC20/=src/token/standardERC20
+@taxToken/=src/token/taxToken
+@standardNFT/=src/nft/standardNFT
+@vesting/=src/locker/vesting
+@treasury/=src/treasury
