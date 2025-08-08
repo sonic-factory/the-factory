@@ -31,17 +31,6 @@ The Factory uses a **Clone Factory Pattern** for gas-efficient deployments:
 3. **Initialization**: Each clone is initialized with custom parameters
 4. **Fee System**: Configurable creation fees collected by treasury
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Factory        │───>│  Implementation  │<───│  Clone 1        │
-│  Contract       │    │  Contract        │    │  (User Token)   │
-│                 │    │                  │    │                 │
-│  • Clone logic  │    │  • Business      │    ├─────────────────┤
-│  • Fee collect  │    │    logic         │    │  Clone 2        │
-│  • Access ctrl  │    │                  │    │  (User Token)   │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
-
 ## 🛡️ Security Features
 
 - **OpenZeppelin Contracts**: Built on battle-tested, audited libraries
