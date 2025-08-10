@@ -22,6 +22,8 @@ The Factory is a modular ecosystem of factory contracts that enable one-click de
 - Supports both native ETH and ERC20 token vesting
 - Configurable start times and vesting durations
 
+### 🔜 MORE FACTORIES STILL IN DEVELOPMENT!
+
 ## 🏗️ Architecture
 
 The Factory uses a **Clone Factory Pattern** for gas-efficient deployments:
