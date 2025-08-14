@@ -3,12 +3,12 @@ pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@taxToken/TaxToken.sol";
+import "@common/CollectorHelper.sol";
 
 /**
  * @title Tax Token Factory
@@ -16,19 +16,16 @@ import "@taxToken/TaxToken.sol";
  * @dev Proxy implementation are Clones. Implementation is immutable and not upgradeable.
  */
 contract TaxTokenFactory is 
-    Ownable,
     Pausable,
     ReentrancyGuard,
     FactoryErrors,
-    FactoryEvents
+    FactoryEvents,
+    CollectorHelper
 {
     using SafeERC20 for IERC20;
 
     /// @notice The address of the token implementation contract.
     address public immutable tokenImplementation;
-    /// @notice The address of the treasury where the fees are sent.
-    address public treasury;
-
     /// @notice The fee to create a new token.
     uint256 public creationFee;
     /// @notice The number of tokens created.
@@ -39,18 +36,18 @@ contract TaxTokenFactory is
 
     /// @notice Constructor arguments for the token factory.
     /// @param _tokenImplementation This is the address of the token to be cloned.
-    /// @param _treasury The multi-sig or contract address where the fees are sent.
+    /// @param _initialOwner The initial owner of the contract.
+    /// @param _feeCollector The address that collects the fees.
     /// @param _creationFee The amount to collect for every contract creation.
     constructor(
         address _tokenImplementation,
-        address _treasury,
+        address _initialOwner,
+        address _feeCollector,
         uint256 _creationFee
-    ) Ownable (msg.sender) {
+    ) CollectorHelper(_initialOwner, _feeCollector) {
         if (_tokenImplementation == address(0)) revert ZeroAddress();
-        if (_treasury == address(0)) revert ZeroAddress();
 
         tokenImplementation = _tokenImplementation;
-        treasury = _treasury;
         creationFee = _creationFee;
 
         _pause();
@@ -93,14 +90,6 @@ contract TaxTokenFactory is
         IdToAddress[tokenCounter] = token;
 
         emit TokenCreated(token, msg.sender);
-    }
-
-    /// @notice This function sets the treasury address.
-    function setTreasury(address _treasury) external onlyOwner {
-        if(_treasury == address(0)) revert ZeroAddress();
-
-        treasury = _treasury;
-        emit TreasuryUpdated(_treasury);
     }
 
     /// @notice This function sets the creation fee.

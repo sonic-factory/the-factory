@@ -3,12 +3,12 @@ pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@standardERC20/StandardERC20.sol";
+import "@common/CollectorHelper.sol";
 
 /**
  * @title Standard ERC20 Factory
@@ -16,18 +16,16 @@ import "@standardERC20/StandardERC20.sol";
  * @dev Proxy implementation are Clones. Implementation is immutable and not upgradeable.
  */
 contract StandardERC20Factory is 
-    Ownable,
     Pausable,
     ReentrancyGuard,
     FactoryErrors,
-    FactoryEvents
+    FactoryEvents,
+    CollectorHelper
 {
     using SafeERC20 for IERC20;
 
     /// @notice The address of the token implementation contract
     address public immutable tokenImplementation;
-    /// @notice The treasury address
-    address public treasury;
     /// @notice Array for the tokens created on the platform.
     address[] public tokens;
     /// @notice The fee to be paid when creating a token.
@@ -40,18 +38,18 @@ contract StandardERC20Factory is
 
     /// @notice Constructor arguments for the token factory.
     /// @param _tokenImplementation This is the address of the token to be cloned.
-    /// @param _treasury The multi-sig or contract address where the fees are sent.
+    /// @param _initialOwner The initial owner of the contract.
+    /// @param _feeCollector The address that collects the fees.
     /// @param _creationFee The amount to collect for every contract creation.
     constructor(
         address _tokenImplementation,
-        address _treasury,
+        address _initialOwner,
+        address _feeCollector,
         uint256 _creationFee
-    ) Ownable (msg.sender) {
+    ) CollectorHelper(_initialOwner, _feeCollector) {
         if (_tokenImplementation == address(0)) revert ZeroAddress();
-        if (_treasury == address(0)) revert ZeroAddress();
 
         tokenImplementation = _tokenImplementation;
-        treasury = _treasury;
         creationFee = _creationFee;
 
         _pause();
@@ -84,14 +82,6 @@ contract StandardERC20Factory is
         IdToAddress[tokenCounter] = token;
 
         emit TokenCreated(token, msg.sender);
-    }
-
-    /// @notice This function sets the treasury address.
-    function setTreasury(address _treasury) external onlyOwner {
-        require(_treasury != address(0), "TokenFactory: treasury is the zero address");
-
-        treasury = _treasury;
-        emit TreasuryUpdated(_treasury);
     }
 
     /// @notice This function sets the creation fee.

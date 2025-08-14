@@ -12,6 +12,7 @@ contract TaxTokenTest is Test {
     address public owner = makeAddr("owner");
     address public user = makeAddr("user");
     address public taxBeneficiary = makeAddr("taxBeneficiary");
+    address public feeCollector = makeAddr("feeCollector");
     
     string constant TOKEN_NAME = "Test Token";
     string constant TOKEN_SYMBOL = "TTK";
@@ -38,6 +39,7 @@ contract TaxTokenTest is Test {
         taxTokenFactory = new TaxTokenFactory(
             address(taxToken),
             owner,
+            feeCollector,
             CREATION_FEE
         );
 

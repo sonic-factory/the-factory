@@ -3,12 +3,12 @@ pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@standardNFT/StandardNFT.sol";
+import "@common/CollectorHelper.sol";
 
 /**
  * @title Standard NFT Factory
@@ -16,11 +16,11 @@ import "@standardNFT/StandardNFT.sol";
  * @dev Proxy implementation are Clones. Implementation is immutable and not upgradeable.
  */
 contract StandardNFTFactory is 
-    Ownable,
     Pausable,
     ReentrancyGuard,
     FactoryErrors,
-    FactoryEvents
+    FactoryEvents,
+    CollectorHelper
 {
     using SafeERC20 for IERC20;
 
@@ -33,8 +33,6 @@ contract StandardNFTFactory is
 
     /// @notice The address of the NFT implementation contract.
     address public immutable nftImplementation;
-    /// @notice The address of the fee collector where the fees are sent.
-    address public feeCollector;
     /// @notice The fee to create a new NFT.
     uint256 public creationFee;
     /// @notice The number of NFTs created.
@@ -49,24 +47,18 @@ contract StandardNFTFactory is
 
     /// @notice Constructor arguments for the NFT factory.
     /// @param _nftImplementation This is the address of the NFT to be cloned.
+    /// @param _initialOwner The owner of the factory contract.
     /// @param _feeCollector The multi-sig or contract address where the fees are sent.
-    /// @param _owner The owner of the factory contract.
     /// @param _creationFee The amount to collect for every contract creation.
     constructor(
         address _nftImplementation,
+        address _initialOwner,
         address _feeCollector,
-        address _owner,
         uint256 _creationFee
-    ) Ownable (_owner) {
-        require(
-            _nftImplementation != address(0) && 
-            _feeCollector != address(0) &&
-            _owner != address(0),
-            ZeroAddress()
-        );
+    ) CollectorHelper (_initialOwner, _feeCollector) {
+        if(_nftImplementation == address(0)) revert ZeroAddress();
 
         nftImplementation = _nftImplementation;
-        feeCollector = _feeCollector;
         creationFee = _creationFee;
 
         _pause();
@@ -120,15 +112,6 @@ contract StandardNFTFactory is
         });
 
         emit NFTCreated(nft, msg.sender, nftCounter);
-    }
-
-    /// @notice This function sets the cee collector address.
-    /// @param _feeCollector The address of the fee collector to set.
-    function setFeeCollector(address _feeCollector) external onlyOwner {
-        require(_feeCollector != address(0), ZeroAddress());
-
-        feeCollector = _feeCollector;
-        emit FeeCollectorUpdated(_feeCollector);
     }
 
     /// @notice This function sets the creation fee.
