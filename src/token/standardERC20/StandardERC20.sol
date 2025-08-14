@@ -4,24 +4,29 @@ pragma solidity 0.8.28;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
 
+import "@common/FactoryErrors.sol";
+import "@common/FactoryEvents.sol";
+
 /**
  * @title Standard ERC20 Token
  * @notice This contract implements a standard ERC20 token with burnable functionality.
  */
-contract StandardERC20 is ERC20BurnableUpgradeable, OwnableUpgradeable {
-    
+contract StandardERC20 is 
+    ERC20BurnableUpgradeable,
+    OwnableUpgradeable,
+    FactoryErrors,
+    FactoryEvents
+{    
     /// @notice Disables the ability to call the initializer
     constructor() {
         _disableInitializers();
     }
 
-    /**
-     * @notice This function is called by the TokenFactory contract to initialize the token
-     * @param _name The name of the token
-     * @param _symbol The symbol of the token
-     * @param initialSupply The initial supply of the token
-     * @param developer The address of the developer 
-    */
+    /// @notice This function is called by the TokenFactory contract to initialize the token
+    /// @param _name The name of the token
+    /// @param _symbol The symbol of the token
+    /// @param initialSupply The initial supply of the token
+    /// @param developer The address of the developer 
     function initialize(
         string memory _name,
         string memory _symbol,

@@ -7,7 +7,7 @@ contract VestingTest is Common {
 
     function test_initialization() public view {
         assertEq(factory.lockerImplementation(), address(vesting), "Locker implementation should match");
-        assertEq(factory.treasury(), owner, "Treasury should be the owner");
+        assertEq(factory.feeCollector(), owner, "Fee Collector should be the owner");
         assertEq(factory.creationFee(), 1e18, "Creation fee should be 1 ETH");
         assertEq(factory.getTotalLockers(), 0, "Initial locker counter should be zero");
     }
@@ -83,13 +83,13 @@ contract VestingTest is Common {
         assertEq(userBalance, 10e18, "User should receive the vested tokens");
     }
 
-    function test_setTreasury() public {
-        address newTreasury = makeAddr("newTreasury");
+    function test_setFeeCollector() public {
+        address newFeeCollector = makeAddr("newFeeCollector");
 
         vm.prank(owner);
-        factory.setTreasury(newTreasury);
+        factory.setFeeCollector(newFeeCollector);
 
-        assertEq(factory.treasury(), newTreasury, "Treasury should be updated");
+        assertEq(factory.feeCollector(), newFeeCollector, "Fee Collector should be updated");
     }
 
     function test_setCreationFee() public {
@@ -107,8 +107,8 @@ contract VestingTest is Common {
         vm.prank(owner);
         factory.collectFees();
 
-        uint256 treasuryBalance = address(factory.treasury()).balance;
-        assertEq(treasuryBalance, 1e18, "Treasury should collect the creation fee");
+        uint256 feeCollectorBalance = address(factory.feeCollector()).balance;
+        assertEq(feeCollectorBalance, 1e18, "Fee Collector should collect the creation fee");
     }
 
     function test_collectTokens() public {
@@ -117,8 +117,8 @@ contract VestingTest is Common {
         vm.prank(owner);
         factory.collectTokens(address(token));
 
-        uint256 treasuryBalance = token.balanceOf(factory.treasury());
-        assertEq(treasuryBalance, 10e18, "Treasury should collect the tokens");
+        uint256 feeCollectorBalance = token.balanceOf(factory.feeCollector());
+        assertEq(feeCollectorBalance, 10e18, "Fee Collector should collect the tokens");
     }
 
     

@@ -3,19 +3,25 @@ pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@vesting/Vesting.sol";
+import "@common/CollectorHelper.sol";
 
 /**
  * @title Vesting Factory
  * @notice This is a factory for creating Vesting contracts.
  * @dev Proxy implementation are Clones. Implementation is immutable and not upgradeable.
  */
-contract VestingFactory is Ownable, Pausable, ReentrancyGuard {
+contract VestingFactory is 
+    Pausable, 
+    ReentrancyGuard,
+    FactoryErrors,
+    FactoryEvents,
+    CollectorHelper
+{
     using SafeERC20 for IERC20;
 
     /// @notice Information of each locker
@@ -29,9 +35,6 @@ contract VestingFactory is Ownable, Pausable, ReentrancyGuard {
 
     /// @notice The address of the locker implementation contract.
     address public immutable lockerImplementation;
-    /// @notice The address of the treasury where the fees are sent.
-    address public treasury;
-
     /// @notice The fee to create a new locker.
     uint256 public creationFee;
     /// @notice The number of lockers created.
@@ -44,52 +47,22 @@ contract VestingFactory is Ownable, Pausable, ReentrancyGuard {
     /// @notice Mapping from locker address to its registry information.
     mapping(address locker => LockerInfo info) internal lockerInfo;
 
-    /// @notice Emitted when a new locker is created.
-    event LockerCreated(
-        address indexed locker, 
-        address indexed creator,
-        uint64 startTimestamp,
-        uint64 durationSeconds,
-        uint256 indexed lockerId
-    );
-    /// @notice Emitted when the treasury address is updated.
-    event TreasuryUpdated(address treasury);
-    /// @notice Emitted when the creation fee is updated.
-    event CreationFeeUpdated(uint256 creationFee);
-
-    /// @notice Thrown when the address set is zero
-    error ZeroAddress();
-    /// @notice Thrown when the amount set is zero
-    error ZeroAmount();
-    /// @notice Thrown when the payable amount is invalid
-    error InvalidFee();
-    /// @notice Thrown when the address is invalid
-    error InvalidAddress();
-    /// @notice Thrown when the start timestamp is not in the future
-    error InvalidTimestamp();
-
     /**
      * @notice Constructor arguments for the locker factory.
      * @param _lockerImplementation This is the address of the locker to be cloned.
-     * @param _treasury The multi-sig or contract address where the fees are sent.
-     * @param _owner The owner of the factory contract.
+     * @param _initialOwner The initial owner of the factory.
+     * @param _feeCollector The address that will collect the creation fees.
      * @param _creationFee The amount to collect for every contract creation.
-    */
+     */
     constructor(
         address _lockerImplementation,
-        address _treasury,
-        address _owner,
+        address _initialOwner,
+        address _feeCollector,
         uint256 _creationFee
-    ) Ownable (_owner) {
-        require(
-            _lockerImplementation != address(0) && 
-            _treasury != address(0) &&
-            _owner != address(0),
-            ZeroAddress()
-        );
+    ) CollectorHelper(_initialOwner, _feeCollector) {
+        if(_lockerImplementation == address(0)) revert ZeroAddress();
 
         lockerImplementation = _lockerImplementation;
-        treasury = _treasury;
         creationFee = _creationFee;
 
         _pause();
@@ -113,8 +86,8 @@ contract VestingFactory is Ownable, Pausable, ReentrancyGuard {
         address _token,
         uint256 _amount
     ) external payable whenNotPaused nonReentrant returns (address payable locker) {
-        require(_startTimestamp > block.timestamp, InvalidTimestamp());
-        require(msg.value >= creationFee, InvalidFee());
+        if(_startTimestamp < block.timestamp) revert InvalidTimestamp();
+        if(msg.value < creationFee) revert InvalidFee();
 
         lockerCounter = lockerCounter + 1;
 
@@ -140,6 +113,7 @@ contract VestingFactory is Ownable, Pausable, ReentrancyGuard {
         if (_isNative == true) {
             // Transfer ETH to the locker if it is native.
             require(msg.value >= (creationFee + _amount), InvalidFee());
+
             (bool success, ) = locker.call{value: _amount}("");
             require(success, "Failed to send Ether");
 
@@ -167,38 +141,11 @@ contract VestingFactory is Ownable, Pausable, ReentrancyGuard {
         emit LockerCreated(locker, msg.sender, _startTimestamp, _durationSeconds, lockerCounter);
     }
 
-    /// @notice This function sets the treasury address.
-    /// @param _treasury The address of the treasury to set.
-    function setTreasury(address _treasury) external onlyOwner {
-        require(_treasury != address(0), ZeroAddress());
-
-        treasury = _treasury;
-        emit TreasuryUpdated(_treasury);
-    }
-
     /// @notice This function sets the creation fee.
     /// @param _creationFee The amount to set as the creation fee.
     function setCreationFee(uint256 _creationFee) external onlyOwner {       
         creationFee = _creationFee;
         emit CreationFeeUpdated(_creationFee);
-    }
-
-    /// @notice This function allows the owner to collect the contract balance.
-    function collectFees() external onlyOwner {
-        require(treasury != address(0), ZeroAddress());
-        require(address(this).balance > 0, ZeroAmount());
-
-        (bool success, ) = treasury.call{value: address(this).balance}("");
-        require(success, "Failed to send Ether");
-    }
-
-    /// @notice This function allows the owner to collect foreign tokens sent to the contract.
-    /// @param token The address of the token to collect.
-    function collectTokens(address token) external onlyOwner {
-        require(token != address(0), ZeroAddress());
-        require(IERC20(token).balanceOf(address(this)) > 0, ZeroAmount());
-
-        IERC20(token).safeTransfer(treasury, IERC20(token).balanceOf(address(this)));
     }
 
     /// @notice This function allows the owner to pause the contract.

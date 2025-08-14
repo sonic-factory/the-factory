@@ -5,9 +5,20 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-/// @title Standard NFT
-/// @notice This contract is a standard ERC721 implementation
-contract StandardNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable {
+import "@common/FactoryErrors.sol";
+import "@common/FactoryEvents.sol";
+
+/**
+ * @title Standard NFT
+ * @notice This contract is a standard ERC721 implementation
+ */
+contract StandardNFT is 
+    Initializable,
+    ERC721Upgradeable,
+    OwnableUpgradeable,
+    FactoryErrors,
+    FactoryEvents
+{
 
     /// @notice The base URI for the NFT metadata.
     string private _baseTokenURI;
@@ -15,12 +26,6 @@ contract StandardNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable {
     uint256 private _nextTokenId;
     /// @notice Lock indicator for metadata changes.
     bool private metadataLocked;
-
-    /// @notice Error thrown when metadata is locked.
-    error MetadataAlreadyLocked();
-
-    /// @notice Event emitted when metadata is locked.
-    event MetadataLocked();
 
     /// @notice Disables the initializer function to prevent re-initialization.
     constructor() {
@@ -56,14 +61,14 @@ contract StandardNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable {
 
     /// @notice Updates base URI (only if not locked)
     function setBaseURI(string memory baseURI) external onlyOwner {
-        require(!metadataLocked, MetadataAlreadyLocked());
+        if(metadataLocked) revert MetadataAlreadyLocked();
 
         _baseTokenURI = baseURI;
     }
 
     /// @notice Permanently locks metadata (irreversible).
     function lockMetadata() external onlyOwner {
-        require(!metadataLocked, MetadataAlreadyLocked());
+        if(metadataLocked) revert MetadataAlreadyLocked();
 
         metadataLocked = true;
 

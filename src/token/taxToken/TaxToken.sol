@@ -5,19 +5,20 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import "@common/FactoryErrors.sol";
+import "@common/FactoryEvents.sol";
+
 /**
  * @title Tax Token
  * @notice This contract implements an ERC20 token with a transfer tax mechanism.
  */
-contract TaxToken is Initializable, ERC20Upgradeable, OwnableUpgradeable {
-
-    /// @notice Thrown when the tax rate exceeds the maximum tax rate
-    error TaxRateExceedsMax();
-    /// @notice Thrown when the address set is zero
-    error ZeroAddress();
-    /// @notice Thrown when the amount is zero
-    error ZeroAmount();
-
+contract TaxToken is 
+    Initializable,
+    ERC20Upgradeable,
+    OwnableUpgradeable,
+    FactoryErrors,
+    FactoryEvents
+{
     /// @notice Scaling factor for decimal precision.
     uint256 public constant SCALING_FACTOR = 10_000; 
     /// @notice The tax limit by default (20%)
@@ -31,15 +32,6 @@ contract TaxToken is Initializable, ERC20Upgradeable, OwnableUpgradeable {
     mapping(address => bool) public noTaxRecipient;
     /// @notice Sender addresses that are to be excluded from tax.
     mapping(address => bool) public noTaxSender;
-
-    /// @notice Event emitted when the transfer tax rate is updated.
-    event TransferTaxRateUpdated(address indexed owner, uint256 newRate);
-    /// @notice Event emitted when the tax beneficiary address is updated.
-    event TaxBeneficiaryUpdated(address indexed owner, address indexed taxBeneficiary);
-    /// @notice Event emitted when a no tax sender address is set.
-    event SetNoTaxSenderAddr(address indexed owner, address indexed noTaxSenderAddr, bool _value);
-    /// @notice Event emitted when a no tax recipient address is set.
-    event SetNoTaxRecipientAddr(address indexed owner, address indexed noTaxRecipientAddr, bool _value);
 
     constructor() {
         _disableInitializers();

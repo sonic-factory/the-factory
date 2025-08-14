@@ -7,7 +7,7 @@ contract StandardNFTTest is Common {
 
     function test_factoryDeployment() public view {
         assertEq(address(factory.nftImplementation()), address(nft));
-        assertEq(factory.treasury(), beneficiary);
+        assertEq(factory.feeCollector(), beneficiary);
         assertEq(factory.owner(), owner);
         assertEq(factory.creationFee(), 1 ether);
         assertEq(factory.getTotalNFT(), 0);
