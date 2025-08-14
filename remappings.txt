@@ -4,3 +4,4 @@
 @standardNFT/=src/nft/standardNFT
 @vesting/=src/locker/vesting
 @treasury/=src/treasury
+@common/=src/common
