@@ -23,9 +23,10 @@ abstract contract CollectorHelper is
         address _initialOwner,
         address _feeCollector
     ) Ownable(_initialOwner) {
-        if (_feeCollector == address(0)) revert ZeroAddress();
+        if (_initialOwner == address(0) || _feeCollector == address(0)) revert ZeroAddress();
         
         feeCollector = _feeCollector;
+        
         emit FeeCollectorUpdated(_feeCollector);
     }
 
