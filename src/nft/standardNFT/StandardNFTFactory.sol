@@ -64,7 +64,7 @@ contract StandardNFTFactory is
         _pause();
     }
 
-    /// @notice This function allows the contract to receive Ether.
+    /// @notice This function allows the contract to receive ETH.
     receive() external payable {}
 
     /// @notice This function is called to create a new NFT contract.
@@ -76,19 +76,18 @@ contract StandardNFTFactory is
         string memory _symbol,
         string memory baseURI
     ) external payable whenNotPaused nonReentrant returns (address nft) {
-        require(
-            bytes(_name).length > 0 && 
-            bytes(_symbol).length > 0 && 
-            bytes(baseURI).length > 0,
-            InputCannotBeNull()
-        );
-        require(msg.value >= creationFee, InvalidFee());
+        if(
+            bytes(_name).length < 0 || 
+            bytes(_symbol).length < 0 || 
+            bytes(baseURI).length < 0
+        ) revert InputCannotBeNull();
+        if(msg.value < creationFee) revert InvalidFee();
 
         uint256 excessEth = msg.value - creationFee;
 
         if (excessEth > 0) {
             (bool success, ) = msg.sender.call{value: excessEth}("");
-            require(success, "Excess Ether refund failed");
+            require(success, "Failed to refund excess ETH");
         }
 
         nftCounter = nftCounter + 1;
@@ -142,7 +141,7 @@ contract StandardNFTFactory is
         return IdToAddress[nftId];
     }
 
-    /// @notice Get all lockers created by a specific creator.
+    /// @notice Get all NFT created by a specific creator.
     /// @param creator The address of the creator to retrieve lockers for.
     function getNFTByCreator(address creator) external view returns (address[] memory) {
         return creatorToNFT[creator];
