@@ -184,6 +184,6 @@ contract VestingFactory is
     /// @notice Validates if the locker address is valid.
     /// @param locker The address of the locker to validate.
     function isValidLocker(address locker) external view returns (bool) {
-        return locker != address(0) && lockerInfo[locker].lockerAddress == locker;
+        return lockerInfo[locker].lockerAddress == locker;
     }
 }
