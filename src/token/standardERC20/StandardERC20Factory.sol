@@ -155,8 +155,9 @@ contract StandardERC20Factory is
         return tokenInfo[token];
     }
 
-    /// @notice This function allows the UI to get a token address by its ID.
-    function getTokenById(uint256 tokenId) external view returns (address) {
-        return IdToAddress[tokenId];
+    /// @notice Validates if the Token address is valid.
+    /// @param token The address of the token to validate.
+    function isValidToken(address token) external view returns (bool) {
+        return tokenInfo[token].tokenAddress == token;
     }
 }

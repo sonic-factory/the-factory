@@ -156,6 +156,6 @@ contract StandardNFTFactory is
     /// @notice Validates if the NFT address is valid.
     /// @param nft The address of the NFT to validate.
     function isValidNFT(address nft) external view returns (bool) {
-        return nft != address(0) && nftInfo[nft].nftAddress == nft;
+        return nftInfo[nft].nftAddress == nft;
     }
 }
