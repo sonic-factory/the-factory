@@ -24,17 +24,28 @@ contract StandardERC20Factory is
 {
     using SafeERC20 for IERC20;
 
+    /// @notice Information of each token
+    struct TokenInfo {
+        address tokenAddress;
+        address creator;
+        string name;
+        string symbol;
+        uint256 tokenId;
+    }
+
     /// @notice The address of the token implementation contract
     address public immutable tokenImplementation;
-    /// @notice Array for the tokens created on the platform.
-    address[] public tokens;
     /// @notice The fee to be paid when creating a token.
     uint256 public creationFee;
     /// @notice The count of tokens created by the platform.
     uint256 public tokenCounter;
 
-    /// @notice The mapping for the token ID and token address.
-    mapping(uint256 tokenId => address tokenAddress) public IdToAddress;
+    /// @notice Mapping for the token ID and token address.
+    mapping(uint256 tokenId => address tokenAddress) internal IdToAddress;
+    /// @notice Mapping from creator address to their token addresses.
+    mapping(address creator => address[] tokens) internal creatorToTokens;
+    /// @notice Mapping from token address to its registry information.
+    mapping(address token => TokenInfo info) internal tokenInfo;
 
     /// @notice Constructor arguments for the token factory.
     /// @param _tokenImplementation This is the address of the token to be cloned.
@@ -62,31 +73,51 @@ contract StandardERC20Factory is
     /// @param name The name of the token
     /// @param symbol The symbol of the token
     /// @param initialSupply The initial supply of the token
-    /// @param developer The address of the developer
     function createToken(
         string memory name,
         string memory symbol,
-        uint256 initialSupply,
-        address developer
-    ) external payable whenNotPaused nonReentrant {
-        if (developer == address(0)) revert ZeroAddress();
-        if (msg.value != creationFee) revert InvalidFee();
+        uint256 initialSupply
+    ) external payable whenNotPaused nonReentrant returns (address token) {
+        if(
+            bytes(name).length == 0 || 
+            bytes(symbol).length == 0
+        ) revert InputCannotBeNull();
+        if(msg.value < creationFee) revert InvalidFee();
+
+        uint256 excessEth = msg.value - creationFee;
+
+        if(excessEth > 0) {
+            (bool success, ) = msg.sender.call{value: excessEth}("");
+            require(success, "Failed to refund excess ETH");
+        }
 
         tokenCounter = tokenCounter + 1;
 
-        address token = Clones.clone(tokenImplementation);
+        token = Clones.clone(tokenImplementation);
 
-        StandardERC20(token).initialize(name, symbol, initialSupply, msg.sender);
+        StandardERC20(token).initialize(
+            name, 
+            symbol, 
+            initialSupply, 
+            msg.sender
+        );
 
-        tokens.push(token);
         IdToAddress[tokenCounter] = token;
+        creatorToTokens[msg.sender].push(token);
+
+        tokenInfo[token] = TokenInfo({
+            tokenAddress: token,
+            creator: msg.sender,
+            name: name,
+            symbol: symbol,
+            tokenId: tokenCounter
+        });
 
         emit TokenCreated(token, msg.sender);
     }
 
     /// @notice This function sets the creation fee.
     function setCreationFee(uint256 _creationFee) external onlyOwner {
-        
         creationFee = _creationFee;
         emit CreationFeeUpdated(_creationFee);
     }
@@ -101,9 +132,27 @@ contract StandardERC20Factory is
         _unpause();
     }
 
-    /// @notice This function allows the UI to get all the tokens created by the factory.
-    function getTokens() external view returns (address[] memory) {
-        return tokens;
+    /// @notice Get the total number of Tokens created.
+    function getTotalTokens() external view returns (uint256) {
+        return tokenCounter;
+    }
+
+    /// @notice Get the Token address by its ID.
+    /// @param tokenId The ID of the token to retrieve.
+    function getTokenById(uint256 tokenId) external view returns (address) {
+        return IdToAddress[tokenId];
+    }
+
+    /// @notice Get all Tokens created by a specific creator.
+    /// @param creator The address of the creator to retrieve tokens for.
+    function getTokensByCreator(address creator) external view returns (address[] memory) {
+        return creatorToTokens[creator];
+    }
+
+    /// @notice Get the Token information by its address.
+    /// @param token The address of the token to retrieve information for.
+    function getTokenInfo(address token) external view returns (TokenInfo memory) {
+        return tokenInfo[token];
     }
 
     /// @notice This function allows the UI to get a token address by its ID.
