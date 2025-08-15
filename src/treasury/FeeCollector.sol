@@ -13,7 +13,7 @@ import "@treasury/interface/IFactory.sol";
 
 /**
  * @title Fee Collector
- * @dev This contract is responsible for collecting fees from the whole protocol.
+ * @notice This contract is responsible for collecting fees from the whole protocol.
  */
 contract FeeCollector is
     Initializable,
