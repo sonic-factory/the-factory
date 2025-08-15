@@ -19,6 +19,18 @@ abstract contract CollectorHelper is
 {
     using SafeERC20 for IERC20;
 
+    /// @notice The address that collects the fees.
+    address public feeCollector;
+
+    /// @notice Modifier to check if the caller is the collector.
+    modifier onlyCollector {
+        require(msg.sender == feeCollector, InvalidCollector());
+        _;
+    }
+
+    /// @notice Constructor to initialize the contract with an owner and fee collector.
+    /// @param _initialOwner The address of the initial owner.
+    /// @param _feeCollector The address of the fee collector.
     constructor(
         address _initialOwner,
         address _feeCollector
@@ -29,9 +41,6 @@ abstract contract CollectorHelper is
         
         emit FeeCollectorUpdated(_feeCollector);
     }
-
-    /// @notice The address that collects the fees.
-    address public feeCollector;
 
     /// @notice This function allows the owner to collect the contract balance.
     function collectFees() external onlyOwner {
