@@ -16,6 +16,10 @@ abstract contract FactoryErrors {
     error InvalidAddress();
     /// @notice Error thrown when an invalid implementation address is provided.
     error InvalidImplementationAddress();
+    /// @notice Thrown when the caller is not the collector.
+    error InvalidCollector();
+    /// @notice Thrown when the input is invalid
+    error InputCannotBeNull();
 
     /** 
      * VESTING ERRORS
@@ -28,10 +32,6 @@ abstract contract FactoryErrors {
     /**
      * NFT ERRORS
      */
-    /// @notice Thrown when the input is invalid
-    error InputCannotBeNull();
-    /// @notice Thrown when the caller is not the collector.
-    error InvalidCollector();
     /// @notice Error thrown when metadata is locked.
     error MetadataAlreadyLocked();
 
