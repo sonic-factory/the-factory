@@ -36,6 +36,8 @@ abstract contract FactoryEvents {
       */
     /// @notice Event emitted when a token is created on the platform.
     event TokenCreated(address indexed token, address indexed owner);
+    /// @notice Event emitted when a tax token is created on the platform.
+    event TaxTokenCreated(address indexed taxToken, address indexed owner);
     /// @notice Event emitted when the transfer tax rate is updated.
     event TransferTaxRateUpdated(address indexed owner, uint256 newRate);
     /// @notice Event emitted when the tax beneficiary address is updated.
