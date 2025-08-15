@@ -68,7 +68,7 @@ contract VestingFactory is
         _pause();
     }
 
-    /// @notice This function allows the contract to receive Ether.
+    /// @notice This function allows the contract to receive ETH.
     receive() external payable {}
 
     /**
@@ -115,13 +115,13 @@ contract VestingFactory is
             require(msg.value >= (creationFee + _amount), InvalidFee());
 
             (bool success, ) = locker.call{value: _amount}("");
-            require(success, "Failed to send Ether");
+            require(success, "Failed to send ETH");
 
             // Refund excess ETH if any.
             uint256 excessNative = msg.value - (creationFee + _amount);
             if (excessNative > 0) {
                 (bool excessSuccess, ) = msg.sender.call{value: excessNative}("");
-                require(excessSuccess, "Failed to refund excess Ether");
+                require(excessSuccess, "Failed to refund excess ETH");
             }
         } else {
             // Transfer tokens to the locker if not native.
@@ -134,7 +134,7 @@ contract VestingFactory is
             uint256 excessNative = msg.value - creationFee;
             if (excessNative > 0) {
                 (bool excessSuccess, ) = msg.sender.call{value: excessNative}("");
-                require(excessSuccess, "Failed to refund excess Ether");
+                require(excessSuccess, "Failed to refund excess ETH");
             }
         }
 

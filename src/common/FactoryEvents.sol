@@ -29,11 +29,7 @@ abstract contract FactoryEvents {
     /// @notice Event emitted when metadata is locked.
     event MetadataLocked();
     /// @notice Emitted when a new NFT is created.
-    event NFTCreated(
-        address indexed nft,
-        address indexed creator,
-        uint256 nftId
-    );
+    event NFTCreated(address indexed nft, address indexed creator, uint256 nftId);
 
     /**
       * TOKEN EVENTS

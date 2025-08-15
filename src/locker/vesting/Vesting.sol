@@ -50,7 +50,7 @@ contract Vesting is
         /// @dev Calls the release function from the VestingWalletUpgradeable contract
         super.release();
     }
-
+    
     /// @notice Release the vest ERC20 tokens to the beneficiary.
     /// @param _token The address of the ERC20 token to be released.
     function release(address _token) public override nonReentrant onlyOwner {
