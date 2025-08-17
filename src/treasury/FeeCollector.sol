@@ -33,8 +33,6 @@ contract FeeCollector is
     
     /// @notice Treasury address where collected fees are sent
     address public treasury;
-    /// @notice Minimum ETH threshold to trigger collection (if not owner)
-    uint256 public collectionThreshold;
 
     /// @dev Prevents the contract from being initialized again.
     constructor() {
@@ -44,11 +42,9 @@ contract FeeCollector is
     /// @notice Function to initialize the contract.
     /// @param _initialOwner The address of the initial owner of the contract.
     /// @param _treasury The treasury address where fees are sent.
-    /// @param _collectionThreshold Minimum ETH amount for non-owner collections.
     function initialize(
         address _initialOwner,
-        address _treasury,
-        uint256 _collectionThreshold
+        address _treasury
     ) external initializer {
         if(_initialOwner == address(0) || _treasury == address(0)) revert ZeroAddress();
         
@@ -56,7 +52,6 @@ contract FeeCollector is
         __UUPSUpgradeable_init();
         
         treasury = _treasury;
-        collectionThreshold = _collectionThreshold;
     }
 
     /// @notice Function to receive ETH from factory contracts
@@ -65,14 +60,8 @@ contract FeeCollector is
     /// @notice Collect fees from specified factories
     /// @param factories Array of factory addresses to collect from
     /// @dev Caller is responsible for providing valid factory addresses
-    function collectFees(address[] calldata factories) external {
+    function collectFees(address[] calldata factories) external onlyOwner {
         if(factories.length == 0) revert EmptyFactoryList();
-        
-        // Only check threshold if not owner
-        if(msg.sender != owner()) {
-            uint256 totalPending = getTotalPendingFees(factories);
-            if(totalPending < collectionThreshold) revert InsufficientFees();
-        }
         
         uint256 initialBalance = address(this).balance;
         
@@ -99,7 +88,7 @@ contract FeeCollector is
     /// @notice Get total pending fees for specific factories
     /// @param factories Array of factory addresses to check
     /// @return total Total pending fees across provided factories
-    function getTotalPendingFees(address[] calldata factories) public view returns (uint256 total) {
+    function getTotalPendingFees(address[] calldata factories) external view returns (uint256 total) {
         for(uint256 i = 0; i < factories.length; i++) {
             try IFactory(factories[i]).pendingFees() returns (uint256 pending) {
                 total += pending;
@@ -128,61 +117,6 @@ contract FeeCollector is
         }
     }
 
-    /// @notice Get balances for factories that implement balance checking
-    /// @param factories Array of factory addresses to check
-    /// @return factoryBalances Array of FactoryFeeInfo structs with ETH balances
-    function getFactoryBalances(address[] calldata factories) external view returns (FactoryFeeInfo[] memory factoryBalances) {
-        factoryBalances = new FactoryFeeInfo[](factories.length);
-        
-        for(uint256 i = 0; i < factories.length; i++) {
-            factoryBalances[i].factory = factories[i];
-            factoryBalances[i].pendingFees = factories[i].balance;
-            factoryBalances[i].success = true; // Balance is always accessible
-        }
-    }
-
-    /// @notice Get detailed fee information for factories with filtering options
-    /// @param factories Array of factory addresses to check
-    /// @param minAmount Minimum amount to include in results (0 for all)
-    /// @return filteredFees Array of factories with fees >= minAmount
-    function getFilteredFactoryFees(
-        address[] calldata factories, 
-        uint256 minAmount
-    ) external view returns (FactoryFeeInfo[] memory filteredFees) {
-        // First pass: count valid entries
-        uint256 validCount = 0;
-        FactoryFeeInfo[] memory tempFees = new FactoryFeeInfo[](factories.length);
-        
-        for(uint256 i = 0; i < factories.length; i++) {
-            uint256 pending = 0;
-            bool success = false;
-            
-            try IFactory(factories[i]).pendingFees() returns (uint256 _pending) {
-                pending = _pending;
-                success = true;
-            } catch {
-                // Try direct balance check as fallback
-                pending = factories[i].balance;
-                success = true;
-            }
-            
-            if(pending >= minAmount) {
-                tempFees[validCount] = FactoryFeeInfo({
-                    factory: factories[i],
-                    pendingFees: pending,
-                    success: success
-                });
-                validCount++;
-            }
-        }
-        
-        // Second pass: create properly sized array
-        filteredFees = new FactoryFeeInfo[](validCount);
-        for(uint256 i = 0; i < validCount; i++) {
-            filteredFees[i] = tempFees[i];
-        }
-    }
-
     /// @notice Emergency function to collect any ERC20 tokens
     /// @param token Address of the token to collect
     function collectTokens(address token) external onlyOwner {
@@ -201,14 +135,6 @@ contract FeeCollector is
         
         treasury = _treasury;
         emit TreasuryUpdated(_treasury);
-    }
-
-    /// @notice Set new collection threshold
-    /// @param _threshold New threshold amount
-    function setCollectionThreshold(uint256 _threshold) external onlyOwner {
-        
-        collectionThreshold = _threshold;
-        emit CollectionThresholdUpdated(_threshold);
     }
 
     /// @notice Function to authorize the upgrade of the contract.
