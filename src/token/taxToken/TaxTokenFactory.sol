@@ -75,7 +75,6 @@ contract TaxTokenFactory is
     /// @param initialSupply The initial supply of the token
     /// @param transferTaxRate The transfer tax rate of the token
     /// @param taxBeneficiary The address of the tax beneficiary
-    /// @param developer The address of the developer
     function createToken(
         string memory name,
         string memory symbol,
@@ -165,3 +164,4 @@ contract TaxTokenFactory is
     function isValidTaxToken(address taxToken) external view returns (bool) {
         return taxTokenInfo[taxToken].tokenAddress == taxToken;
     }
+}

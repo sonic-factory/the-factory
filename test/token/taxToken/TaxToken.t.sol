@@ -53,8 +53,7 @@ contract TaxTokenTest is Test {
                 TOKEN_SYMBOL,
                 INITIAL_SUPPLY,
                 TRANSFER_TAX_RATE,
-                taxBeneficiary,
-                owner
+                taxBeneficiary
             )
         );
 
