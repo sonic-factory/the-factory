@@ -117,6 +117,15 @@ contract FeeCollector is
         }
     }
 
+    /// @notice Emergency function to collect any ETH
+    function collectEth() external onlyOwner {
+        uint256 balance = address(this).balance;
+        if(balance > 0) {
+            (bool success, ) = treasury.call{value: balance}("");
+            require(success, "Failed to send Ether to treasury");
+        }
+    }
+
     /// @notice Emergency function to collect any ERC20 tokens
     /// @param token Address of the token to collect
     function collectTokens(address token) external onlyOwner {
