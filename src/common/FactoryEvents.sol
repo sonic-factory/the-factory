@@ -10,6 +10,8 @@ abstract contract FactoryEvents {
   event FeeCollectorUpdated(address indexed feeCollector);
   /// @notice Emitted when a new creation fee is set.
   event CreationFeeUpdated(uint256 creationFee);
+  /// @notice Emitted when fees are collected.
+  event FeesCollected(address indexed feeCollector, uint256 amount);
 
   /**
    * YIELD FARM EVENTS
