@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: BSL 1.1
 pragma solidity 0.8.28;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
@@ -13,7 +12,6 @@ import "@common/FactoryEvents.sol";
  * @notice Extension contract for fee collection related functions 
  */
 abstract contract CollectorHelper is 
-    Ownable,
     FactoryErrors,
     FactoryEvents
 {
@@ -29,13 +27,9 @@ abstract contract CollectorHelper is
     }
 
     /// @notice Constructor to initialize the contract with an owner and fee collector.
-    /// @param _initialOwner The address of the initial owner.
     /// @param _feeCollector The address of the fee collector.
-    constructor(
-        address _initialOwner,
-        address _feeCollector
-    ) Ownable(_initialOwner) {
-        if (_initialOwner == address(0) || _feeCollector == address(0)) revert ZeroAddress();
+    constructor(address _feeCollector) {
+        if (_feeCollector == address(0)) revert ZeroAddress();
         
         feeCollector = _feeCollector;
         
@@ -43,26 +37,33 @@ abstract contract CollectorHelper is
     }
 
     /// @notice This function allows the owner to collect the contract balance.
-    function collectFees() external onlyOwner {
+    /// @dev Factories should expose a privileged wrapper for this function.
+    function _collectFees() internal {
         if(feeCollector == address(0)) revert ZeroAddress();
         if(address(this).balance == 0) revert ZeroAmount();
 
-        (bool success, ) = feeCollector.call{value: address(this).balance}("");
+        uint256 balance = address(this).balance;
+        (bool success, ) = feeCollector.call{value: balance}("");
         require(success, "Failed to send Ether");
+
+        emit FeesCollected(feeCollector, balance);
     }
 
     /// @notice This function allows the owner to collect foreign tokens sent to the contract.
+    /// @dev Factories should expose a privileged wrapper for this function.
     /// @param token The address of the token to collect.
-    function collectTokens(address token) external onlyOwner {
+    function _collectTokens(address token) internal {
         if(token == address(0)) revert ZeroAddress();
         if(IERC20(token).balanceOf(address(this)) == 0) revert ZeroAmount();
 
-        IERC20(token).safeTransfer(feeCollector, IERC20(token).balanceOf(address(this)));
+        uint256 balance = IERC20(token).balanceOf(address(this));
+        IERC20(token).safeTransfer(feeCollector, balance);
     }
 
     /// @notice This function allows the owner to update the fee collector address.
+    /// @dev Factories should expose a privileged wrapper for this function.
     /// @param newFeeCollector The new address for the fee collector.
-    function setFeeCollector(address newFeeCollector) external onlyOwner {
+    function _setFeeCollector(address newFeeCollector) internal {
         if (newFeeCollector == address(0)) revert ZeroAddress();
 
         feeCollector = newFeeCollector;
