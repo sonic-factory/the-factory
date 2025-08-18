@@ -25,7 +25,8 @@ contract VestingTest is Common {
             durationSeconds, 
             true, 
             address(0), 
-            ethAmount
+            ethAmount,
+            beneficiary
         ));
 
         // Check the locker information
@@ -50,7 +51,8 @@ contract VestingTest is Common {
             durationSeconds, 
             false, 
             address(token), 
-            tokenAmount
+            tokenAmount,
+            beneficiary
         ));
         vm.stopPrank();
 

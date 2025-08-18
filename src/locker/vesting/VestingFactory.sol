@@ -89,7 +89,8 @@ contract VestingFactory is
         uint64 _durationSeconds,
         bool _isNative,
         address _token,
-        uint256 _amount
+        uint256 _amount,
+        address _referrer
     ) external payable whenNotPaused nonReentrant returns (address payable locker) {
         if(_startTimestamp < block.timestamp) revert InvalidTimestamp();
         if(msg.value < creationFee) revert InvalidFee();
@@ -129,6 +130,11 @@ contract VestingFactory is
                 require(excessSuccess, "Failed to refund excess ETH");
             }
 
+            // Distribute referral if applicable
+            if(_referrer != address(0) || _referrer != msg.sender || referralRate > 0 || creationFee > 0) {
+                _distributeReferral(_referrer, creationFee);
+            }
+            
 
         } else {
             // Transfer tokens to the locker if not native.
@@ -142,6 +148,11 @@ contract VestingFactory is
             if (excessNative > 0) {
                 (bool excessSuccess, ) = msg.sender.call{value: excessNative}("");
                 require(excessSuccess, "Failed to refund excess ETH");
+            }
+
+            // Distribute referral if applicable
+            if(_referrer != address(0) || _referrer != msg.sender || referralRate > 0 || creationFee > 0) {
+                _distributeReferral(_referrer, creationFee);
             }
         }
 
