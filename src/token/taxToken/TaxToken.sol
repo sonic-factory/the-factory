@@ -33,6 +33,7 @@ contract TaxToken is
     /// @notice Sender addresses that are to be excluded from tax.
     mapping(address => bool) public noTaxSender;
 
+    /// @notice Disables the ability to call the initializer
     constructor() {
         _disableInitializers();
     }

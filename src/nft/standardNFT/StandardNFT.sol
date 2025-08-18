@@ -27,7 +27,7 @@ contract StandardNFT is
     /// @notice Lock indicator for metadata changes.
     bool private metadataLocked;
 
-    /// @notice Disables the initializer function to prevent re-initialization.
+    /// @notice Disables the ability to call the initializer
     constructor() {
         _disableInitializers();
     }

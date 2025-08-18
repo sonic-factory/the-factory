@@ -18,7 +18,8 @@ contract Vesting is
     FactoryErrors,
     FactoryEvents 
 {
-    /// @notice Disables the initializer function to prevent re-initialization.
+
+    /// @notice Disables the ability to call the initializer
     constructor() {
         _disableInitializers();
     }

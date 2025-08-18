@@ -17,6 +17,7 @@ contract StandardERC20 is
     FactoryErrors,
     FactoryEvents
 {    
+    
     /// @notice Disables the ability to call the initializer
     constructor() {
         _disableInitializers();

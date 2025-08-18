@@ -34,7 +34,7 @@ contract FeeCollector is
     /// @notice Treasury address where collected fees are sent
     address public treasury;
 
-    /// @dev Prevents the contract from being initialized again.
+    /// @notice Disables the ability to call the initializer
     constructor() {
         _disableInitializers();
     }
