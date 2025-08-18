@@ -10,7 +10,7 @@ import "@common/FactoryEvents.sol";
 
 /**
  * @title Collector Helper
- * @notice Helper contract for fee collection related functions 
+ * @notice Extension contract for fee collection related functions 
  */
 abstract contract CollectorHelper is 
     Ownable,
@@ -69,8 +69,9 @@ abstract contract CollectorHelper is
         emit FeeCollectorUpdated(newFeeCollector);
     }
 
-
-
-
-
+    /// @notice This function allows the owner to check the pending fees in the contract.
+    /// @return The amount of pending fees in the contract.
+    function pendingFees() external view returns (uint256) {
+        return address(this).balance;
+    }
 }
