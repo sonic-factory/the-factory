@@ -9,19 +9,18 @@ abstract contract Referral {
     /// @notice Thrown when the referral rate is above the required threshold.
     error InvalidReferralRate(uint256 rate);
 
+    /// @notice Emitted when the referral rate is updated.
+    event ReferralRateUpdated(uint256 newRate);
     /// @notice Emitted when a referral payment is made.
     event ReferralPaid(address indexed referrer, uint256 amount, address indexed payer);
 
     /// @notice Internal setter for referral rate. Factories should expose an onlyOwner wrapper.
     /// @dev _referralRate must be <= 10_000.
-    function _setReferralRate(uint16 _referralRate) internal {
+    function _setReferralRate(uint256 _referralRate) internal {
         if(_referralRate > 10_000) revert InvalidReferralRate(_referralRate);
         referralRate = _referralRate;
-    }
 
-    /// @notice Internal view getter for referral rate.
-    function _getReferralRate() internal view returns (uint256) {
-        return referralRate;
+        emit ReferralRateUpdated(_referralRate);
     }
 
     /// @notice Distribute referral share of `fee` to `referrer`.
@@ -39,14 +38,19 @@ abstract contract Referral {
             return fee;
         }
 
-        // attempt to send referral payment immediately
+        // Attempt to send referral payment immediately
         (bool sent, ) = referrer.call{value: referralAmount}("");
         if (sent) {
             emit ReferralPaid(referrer, referralAmount, msg.sender);
             return fee - referralAmount;
         }
 
-        // if sending the referral fails, do not reduce the fee (keep full amount in factory)
+        // If sending the referral fails, do not reduce the fee (keep full amount in factory)
         return fee;
+    }
+
+    /// @notice External view getter for referral rate.
+    function getReferralRate() external view returns (uint256) {
+        return referralRate;
     }
 }
