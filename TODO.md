@@ -12,4 +12,5 @@
 
 ## Medium Priority
 - [] Deploy the `StandardNFT` contract at Sonic Mainnet.
+- [] Deploy the `StandardYieldFarm` module at Sonic Testnet.
 - [] Create modules for `Omnichain` contracts.
