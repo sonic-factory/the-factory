@@ -2,6 +2,7 @@
 pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -16,6 +17,7 @@ import "@common/CollectorHelper.sol";
  * @dev Proxy implementation are Clones. Implementation is immutable and not upgradeable.
  */
 contract StandardYieldFarmFactory is 
+    Ownable,
     Pausable, 
     ReentrancyGuard,
     FactoryErrors,
@@ -45,7 +47,7 @@ contract StandardYieldFarmFactory is
     /// @notice Mapping from yield farm ID to yield farm address.
     mapping(uint256 yieldFarmId => address yieldFarmAddress) internal IdToAddress;
     /// @notice Mapping from creator address to their yield farm addresses.
-    mapping(address creator => address[] yieldFarm) internal creatorToLockers;
+    mapping(address creator => address[] yieldFarm) internal creatorToYieldFarms;
     /// @notice Mapping from yield farm address to its registry information.
     mapping(address yieldFarm => YieldFarmInfo info) internal yieldFarmInfo;
 
@@ -61,10 +63,10 @@ contract StandardYieldFarmFactory is
         address _initialOwner,
         address _feeCollector,
         uint256 _creationFee
-    ) CollectorHelper(_initialOwner, _feeCollector) {
+    ) Ownable(_initialOwner) CollectorHelper(_feeCollector) {
         if(_yieldFarmImplementation == address(0)) revert ZeroAddress();
 
-        lockerImplementation = _yieldFarmImplementation;
+        yieldFarmImplementation = _yieldFarmImplementation;
         creationFee = _creationFee;
 
         _pause();
@@ -93,16 +95,16 @@ contract StandardYieldFarmFactory is
 
         yieldFarmCounter = yieldFarmCounter + 1;
 
-        yieldFarm = payable(Clones.clone(lockerImplementation));
+        yieldFarm = payable(Clones.clone(yieldFarmImplementation));
 
-        Vesting(yieldFarm).initialize(
+        StandardYieldFarm(yieldFarm).initialize(
             msg.sender,
             _startTimestamp,
             _durationSeconds
         );
 
         IdToAddress[yieldFarmCounter] = yieldFarm;
-        creatorToLockers[msg.sender].push(yieldFarm);
+        creatorToYieldFarms[msg.sender].push(yieldFarm);
 
         yieldFarmInfo[yieldFarm] = YieldFarmInfo({
             yieldFarmAddress: yieldFarm,
@@ -140,7 +142,7 @@ contract StandardYieldFarmFactory is
             }
         }
 
-        emit YieldFarmCreated(yieldFarm, msg.sender, _startTimestamp, _durationSeconds, lockerCounter);
+        emit YieldFarmCreated(yieldFarm, msg.sender, _startTimestamp, _durationSeconds, yieldFarmCounter);
     }
 
     /// @notice This function sets the creation fee.
@@ -160,32 +162,32 @@ contract StandardYieldFarmFactory is
         _unpause();
     }
 
-    /// @notice Get the total number of lockers created.
+    /// @notice Get the total number of yield farms created.
     function getTotalLockers() external view returns (uint256) {
-        return lockerCounter;
+        return yieldFarmCounter;
     }
 
-    /// @notice  Get the locker address by its ID.
-    /// @param lockerId The ID of the locker to retrieve.
-    function getLockerById(uint256 lockerId) external view returns (address) {
-        return IdToAddress[lockerId];
+    /// @notice  Get the yield farm address by its ID.
+    /// @param yieldFarmId The ID of the yield farm to retrieve.
+    function getLockerById(uint256 yieldFarmId) external view returns (address) {
+        return IdToAddress[yieldFarmId];
     }
 
-    /// @notice Get all lockers created by a specific creator.
-    /// @param creator The address of the creator to retrieve lockers for.
+    /// @notice Get all yield farms created by a specific creator.
+    /// @param creator The address of the creator to retrieve yield farms for.
     function getLockersByCreator(address creator) external view returns (address[] memory) {
-        return creatorToLockers[creator];
+        return creatorToYieldFarms[creator];
     }
 
-    /// @notice Get the locker information by its address.
-    /// @param locker The address of the locker to retrieve information for.
-    function getLockerInfo(address locker) external view returns (LockerInfo memory) {
-        return lockerInfo[locker];
+    /// @notice Get the yield farm information by its address.
+    /// @param yieldFarm The address of the yield farm to retrieve information for.
+    function getLockerInfo(address yieldFarm) external view returns (YieldFarmInfo memory) {
+        return yieldFarmInfo[yieldFarm];
     }
 
-    /// @notice Validates if the locker address is valid.
-    /// @param locker The address of the locker to validate.
-    function isValidLocker(address locker) external view returns (bool) {
-        return lockerInfo[locker].lockerAddress == locker;
+    /// @notice Validates if the yield farm address is valid.
+    /// @param yieldFarm The address of the yield farm to validate.
+    function isValidLocker(address yieldFarm) external view returns (bool) {
+        return yieldFarmInfo[yieldFarm].yieldFarmAddress == yieldFarm;
     }
 }
