@@ -2,10 +2,9 @@
 pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@standardERC20/StandardERC20.sol";
 import "@common/CollectorHelper.sol";
@@ -16,6 +15,7 @@ import "@common/CollectorHelper.sol";
  * @dev Proxy implementation are Clones. Implementation is immutable and not upgradeable.
  */
 contract StandardERC20Factory is 
+    Ownable,
     Pausable,
     ReentrancyGuard,
     FactoryErrors,
@@ -57,8 +57,8 @@ contract StandardERC20Factory is
         address _initialOwner,
         address _feeCollector,
         uint256 _creationFee
-    ) CollectorHelper(_initialOwner, _feeCollector) {
-        if (_tokenImplementation == address(0)) revert ZeroAddress();
+    ) Ownable(_initialOwner) CollectorHelper(_feeCollector) {
+        if (_initialOwner == address(0) || _tokenImplementation == address(0)) revert ZeroAddress();
 
         tokenImplementation = _tokenImplementation;
         creationFee = _creationFee;
