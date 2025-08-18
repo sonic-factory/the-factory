@@ -24,7 +24,7 @@ contract Common is Test {
 
         // Deploy the protocol
         vesting = new Vesting();
-        factory = new VestingFactory(address(vesting), owner, owner, 1e18); // 1 ETH creation fee
+        factory = new VestingFactory(address(vesting), owner, owner, 1e18, 50_000); // 1 ETH creation fee
 
         // Unpause the factory to allow locker creation
         vm.prank(owner);
