@@ -16,6 +16,7 @@ contract Common is Test {
     address public user = makeAddr("user");
     address public user2 = makeAddr("user2");
     address public beneficiary = makeAddr("beneficiary");
+    address public collector = makeAddr("collector");
 
     function setUp() public virtual {
 
@@ -23,9 +24,10 @@ contract Common is Test {
         nft = new StandardNFT();
         factory = new StandardNFTFactory(
             address(nft),
-            beneficiary,
             owner,
-            1 ether
+            collector,
+            1 ether,
+            5_000 // 50% referral rate
         );
 
         // Unpause the factory to allow NFT creation
