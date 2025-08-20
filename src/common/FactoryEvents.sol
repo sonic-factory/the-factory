@@ -18,11 +18,12 @@ abstract contract FactoryEvents {
    */
   /// @notice Emitted when a new yield farm is created.
   event YieldFarmCreated(
-    address indexed yieldFarm, 
+    address indexed yieldFarm,
     address indexed creator,
     address feeAddress,
     uint256 rewardPerSec,
-    uint64 startTimestamp
+    uint256 startTimestamp,
+    uint256 yieldFarmId
   );
   /// @notice Emitted when a user deposits into a yield farm.
   event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
