@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "@standardNFT/StandardNFT.sol";
 import "@common/CollectorHelper.sol";
+import "@common/Referral.sol";
 
 /**
  * @title Standard NFT Factory
@@ -20,7 +21,8 @@ contract StandardNFTFactory is
     ReentrancyGuard,
     FactoryErrors,
     FactoryEvents,
-    CollectorHelper
+    CollectorHelper,
+    Referral
 {
     using SafeERC20 for IERC20;
 
@@ -54,13 +56,15 @@ contract StandardNFTFactory is
         address _nftImplementation,
         address _initialOwner,
         address _feeCollector,
-        uint256 _creationFee
+        uint256 _creationFee,
+        uint256 _referralRate
     ) Ownable(_initialOwner) CollectorHelper(_feeCollector) {
         if(_initialOwner == address(0) || _nftImplementation == address(0)) revert ZeroAddress();
 
         nftImplementation = _nftImplementation;
         creationFee = _creationFee;
 
+        _setReferralRate(_referralRate);
         _pause();
     }
 
@@ -74,7 +78,8 @@ contract StandardNFTFactory is
     function createNFT(
         string memory _name,
         string memory _symbol,
-        string memory baseURI
+        string memory baseURI,
+        address _referrer
     ) external payable whenNotPaused nonReentrant returns (address nft) {
         if(
             bytes(_name).length < 0 || 
@@ -82,13 +87,6 @@ contract StandardNFTFactory is
             bytes(baseURI).length < 0
         ) revert InputCannotBeNull();
         if(msg.value < creationFee) revert InvalidFee();
-
-        uint256 excessEth = msg.value - creationFee;
-
-        if (excessEth > 0) {
-            (bool success, ) = msg.sender.call{value: excessEth}("");
-            require(success, "Failed to refund excess ETH");
-        }
 
         nftCounter = nftCounter + 1;
 
@@ -110,7 +108,37 @@ contract StandardNFTFactory is
             nftId: nftCounter
         });
 
+        uint256 excessEth = msg.value - creationFee;
+
+        // Refund excess ETH if any.
+        if (excessEth > 0) {
+            (bool success, ) = msg.sender.call{value: excessEth}("");
+            require(success, "Failed to refund excess ETH");
+        }
+
+        // Distribute referral if applicable
+        if(_referrer != address(0) && _referrer != msg.sender && referralRate > 0 && creationFee > 0) {
+            _distributeReferral(_referrer, creationFee);
+        }
+
         emit NFTCreated(nft, msg.sender, nftCounter);
+    }
+
+    /// @notice This function allows the fee collector to collect the fees.
+    function collectFees() external onlyCollector {
+        _collectFees();
+    }
+
+    /// @notice This function allows the fee collector to collect foreign tokens sent to the contract.
+    /// @param token The address of the token to collect.
+    function collectTokens(address token) external onlyOwner {
+        _collectTokens(token);
+    }
+
+    /// @notice This function sets the fee collector address.
+    /// @param newFeeCollector The new address for the fee collector.
+    function setFeeCollector(address newFeeCollector) external onlyOwner {
+        _setFeeCollector(newFeeCollector);
     }
 
     /// @notice This function sets the creation fee.
@@ -118,6 +146,12 @@ contract StandardNFTFactory is
     function setCreationFee(uint256 _creationFee) external onlyOwner {       
         creationFee = _creationFee;
         emit CreationFeeUpdated(_creationFee);
+    }
+
+    /// @notice This function sets the referral rate.
+    /// @param _referralRate The new referral rate in basis points (0..10_000).
+    function setReferralRate(uint256 _referralRate) external onlyOwner {
+        _setReferralRate(_referralRate);
     }
 
     /// @notice This function allows the owner to pause the contract.
