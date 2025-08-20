@@ -104,7 +104,7 @@ contract StandardYieldFarm is
             massUpdatePools();
         }
 
-        uint64 lastRewardSecond = block.timestamp > startTimestamp ? block.timestamp : startTimestamp;
+        uint256 lastRewardSecond = block.timestamp > startTimestamp ? block.timestamp : startTimestamp;
         totalAllocPoint = totalAllocPoint + _allocPoint;
         poolExistence[_lpToken] = true;
         poolInfo.push(PoolInfo({
