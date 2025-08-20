@@ -13,8 +13,8 @@
 ## Medium Priority
 - [] Deploy the `StandardNFT` contract at Sonic Mainnet.
 - [] Deploy the `StandardYieldFarm` module at Sonic Testnet.
+- [] Add an Airdrop Factory
 - [] Create modules for `Omnichain` contracts.
-- [] Add a user rebate function to the central treasury, token based. Adjust metrics and add recording variables.
 
 ## Low Priority
 - [] Prediction Market Factory?
