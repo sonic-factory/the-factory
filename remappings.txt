@@ -6,3 +6,4 @@
 @vesting/=src/locker/vesting
 @treasury/=src/treasury
 @standardYield/=src/yield/standardYieldFarm
+@airdrop/=src/token/airdrop
