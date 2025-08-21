@@ -2,7 +2,7 @@
 
 ## Sonic Mainnet (chainId: 146) <br> Explorer: https://sonicscan.org/
 
-### Version 2.0 (In development)
+### Version 2.0
 | Contract | Role | Address | Explorer | Notes |
 |---|---|---|---|---|
 | StandardERC20 | Implementation | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Standard ERC-20 Token Implementation Contract |
@@ -11,8 +11,8 @@
 | TaxTokenFactory | Factory | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Tax Token Factory Contract |
 | Vesting | Implementation | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Vesting Implementation Contract |
 | VestingFactory | Factory | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Vesting Factory Contract |
-| StandardNFT | Implementation | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Standard NFT Implementation Contract |
-| StandardNFTFactory | Factory | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Standard NFT Factory Contract |
+| StandardNFT | Implementation | `0x65E46dF3b03B47c9ed3f8EfC663C902E4747E943` | [link](https://sonicscan.org/address/0x65E46dF3b03B47c9ed3f8EfC663C902E4747E943) | Standard NFT Implementation Contract |
+| StandardNFTFactory | Factory | `0x2A40700f3D5DBE0419adca8f834b395dAc0FFe28` | [link](https://sonicscan.org/address/0x2A40700f3D5DBE0419adca8f834b395dAc0FFe28) | Standard NFT Factory Contract |
 | StandardYieldFarm | Implementation | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Yield Farm Implementation Contract |
 | StandardYieldFarmFactory | Factory | `0x0000000000000000000000000000000000000000` | [link](https://sonicscan.org/address/0x0000000000000000000000000000000000000000) | Yield Farm Factory Contract |
 

@@ -10,7 +10,7 @@ import "@standardNFT/StandardNFTFactory.sol";
 contract Deploy is Script {
 
     // Command line input
-    // forge script script/Deploy.sol \
+    // forge script script/DeployStandardNFT.sol \
     // --rpc-url $TESTNET_RPC_URL \ 
     // --etherscan-api-key $SONICSCAN_API_KEY \
     // --verify -vvvv --slow --broadcast --interactives 1
@@ -26,9 +26,9 @@ contract Deploy is Script {
 
         StandardNFTFactory factory = new StandardNFTFactory(
             address(nftImplementation),
-            OWNER,            
+            OWNER,     
             COLLECTOR,
-            10e18, // 5 S
+            10e18,
             1_000
         );
 
