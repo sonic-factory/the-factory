@@ -19,12 +19,22 @@ contract VestingFactory is
     Ownable,
     Pausable, 
     ReentrancyGuard,
-    FactoryErrors,
-    FactoryEvents,
     CollectorHelper,
     Referral
 {
     using SafeERC20 for IERC20;
+
+    /// @notice Thrown when the start timestamp is not in the future
+    error InvalidTimestamp();
+
+    /// @notice Emitted when a new vesting contract is created.
+    event LockerCreated(
+        address indexed locker, 
+        address indexed creator,
+        uint64 startTimestamp,
+        uint64 durationSeconds,
+        uint256 lockerId
+    );
 
     /// @notice Information of each locker
     struct LockerInfo {

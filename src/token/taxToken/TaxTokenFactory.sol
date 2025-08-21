@@ -18,11 +18,12 @@ contract TaxTokenFactory is
     Ownable,
     Pausable,
     ReentrancyGuard,
-    FactoryErrors,
-    FactoryEvents,
     CollectorHelper
 {
     using SafeERC20 for IERC20;
+
+    /// @notice Event emitted when a tax token is created on the platform.
+    event TaxTokenCreated(address indexed taxToken, address indexed owner);
 
     /// @notice Information of each Tax Token
     struct TaxTokenInfo {

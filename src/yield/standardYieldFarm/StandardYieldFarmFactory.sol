@@ -20,11 +20,22 @@ contract StandardYieldFarmFactory is
     Ownable,
     Pausable, 
     ReentrancyGuard,
-    FactoryErrors,
-    FactoryEvents,
     CollectorHelper
 {
     using SafeERC20 for IERC20;
+
+    /// @notice Thrown when the start timestamp is not in the future
+    error InvalidTimestamp();
+
+    /// @notice Emitted when a new yield farm is created.
+    event YieldFarmCreated(
+        address indexed yieldFarm,
+        address indexed creator,
+        address feeAddress,
+        uint256 rewardPerSec,
+        uint256 startTimestamp,
+        uint256 yieldFarmId
+    );
 
     /// @notice Information of each yield farm.
     struct YieldFarmInfo {

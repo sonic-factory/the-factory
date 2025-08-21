@@ -19,12 +19,13 @@ contract StandardNFTFactory is
     Ownable,
     Pausable,
     ReentrancyGuard,
-    FactoryErrors,
-    FactoryEvents,
     CollectorHelper,
     Referral
 {
     using SafeERC20 for IERC20;
+
+    /// @notice Emitted when a new NFT is created.
+    event NFTCreated(address indexed nft, address indexed creator, uint256 nftId);
 
     /// @notice Information of each NFT
     struct NFTInfo {

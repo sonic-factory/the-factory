@@ -7,8 +7,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "@common/FactoryErrors.sol";
-import "@common/FactoryEvents.sol";
+import "@common/CommonErrors.sol";
+import "@common/CommonEvents.sol";
 import "@treasury/interface/IFactory.sol";
 
 /**
@@ -19,11 +19,23 @@ contract FeeCollector is
     Initializable,
     OwnableUpgradeable,
     UUPSUpgradeable,
-    FactoryErrors,
-    FactoryEvents
+    CommonErrors,
+    CommonEvents
 {
     using SafeERC20 for IERC20;
-    
+
+    /// @notice Error thrown when empty factory list provided
+    error EmptyFactoryList();
+    /// @notice Error thrown when insufficient fees to collect
+    error InsufficientFees();
+
+    /// @notice Emitted when fees are collected from factories
+    event FeesCollected(address[] factories, uint256 totalAmount);
+    /// @notice Emitted when treasury is updated
+    event TreasuryUpdated(address indexed newTreasury);
+    /// @notice Emitted when collection threshold is updated
+    event CollectionThresholdUpdated(uint256 newThreshold);
+
     /// @notice Structure to hold factory fee information
     struct FactoryFeeInfo {
         address factory;

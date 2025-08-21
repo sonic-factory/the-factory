@@ -5,8 +5,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "@common/FactoryErrors.sol";
-import "@common/FactoryEvents.sol";
+import "@common/CommonErrors.sol";
+import "@common/CommonEvents.sol";
 
 /**
  * @title Standard NFT
@@ -16,9 +16,15 @@ contract StandardNFT is
     Initializable,
     ERC721Upgradeable,
     OwnableUpgradeable,
-    FactoryErrors,
-    FactoryEvents
+    CommonErrors,
+    CommonEvents
 {
+
+    /// @notice Error thrown when metadata is locked.
+    error MetadataAlreadyLocked();
+
+    /// @notice Event emitted when metadata is locked.
+    event MetadataLocked();
 
     /// @notice The base URI for the NFT metadata.
     string private _baseTokenURI;

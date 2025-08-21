@@ -5,8 +5,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "@common/FactoryErrors.sol";
-import "@common/FactoryEvents.sol";
+import "@common/CommonErrors.sol";
+import "@common/CommonEvents.sol";
 
 /**
  * @title Tax Token
@@ -16,9 +16,22 @@ contract TaxToken is
     Initializable,
     ERC20Upgradeable,
     OwnableUpgradeable,
-    FactoryErrors,
-    FactoryEvents
+    CommonErrors,
+    CommonEvents
 {
+
+    /// @notice Thrown when the tax rate exceeds the maximum tax rate
+    error TaxRateExceedsMax();
+
+    /// @notice Event emitted when the transfer tax rate is updated.
+    event TransferTaxRateUpdated(address indexed owner, uint256 newRate);
+    /// @notice Event emitted when the tax beneficiary address is updated.
+    event TaxBeneficiaryUpdated(address indexed owner, address indexed taxBeneficiary);
+    /// @notice Event emitted when a no tax sender address is set.
+    event SetNoTaxSenderAddr(address indexed owner, address indexed noTaxSenderAddr, bool _value);
+    /// @notice Event emitted when a no tax recipient address is set.
+    event SetNoTaxRecipientAddr(address indexed owner, address indexed noTaxRecipientAddr, bool _value);
+
     /// @notice Scaling factor for decimal precision.
     uint256 public constant SCALING_FACTOR = 10_000; 
     /// @notice The tax limit by default (20%)

@@ -4,16 +4,16 @@ pragma solidity 0.8.28;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "@common/FactoryErrors.sol";
-import "@common/FactoryEvents.sol";
+import "@common/CommonErrors.sol";
+import "@common/CommonEvents.sol";
 
 /**
  * @title Collector Helper
  * @notice Extension contract for fee collection related functions 
  */
 abstract contract CollectorHelper is 
-    FactoryErrors,
-    FactoryEvents
+    CommonErrors,
+    CommonEvents
 {
     using SafeERC20 for IERC20;
 

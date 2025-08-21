@@ -4,8 +4,8 @@ pragma solidity 0.8.28;
 import "@openzeppelin/contracts-upgradeable/finance/VestingWalletUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
-import "@common/FactoryErrors.sol";
-import "@common/FactoryEvents.sol";
+import "@common/CommonErrors.sol";
+import "@common/CommonEvents.sol";
 
 /**
  * @title Vesting
@@ -15,9 +15,14 @@ contract Vesting is
     Initializable,
     ReentrancyGuardUpgradeable,
     VestingWalletUpgradeable,
-    FactoryErrors,
-    FactoryEvents 
+    CommonErrors,
+    CommonEvents
 {
+
+    /// @notice Thrown when tokens are not vested.
+    error NotVested();
+    /// @notice Thrown when the start timestamp is not in the future
+    error InvalidTimestamp();
 
     /// @notice Disables the ability to call the initializer
     constructor() {

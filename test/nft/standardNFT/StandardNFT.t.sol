@@ -132,7 +132,7 @@ contract StandardNFTTest is Common {
     }
 
     function test_collectFees() public {
-        StandardNFT newNft = test_createNFT();
+        test_createNFT();
 
         uint256 initialBalance = address(factory).balance;
 

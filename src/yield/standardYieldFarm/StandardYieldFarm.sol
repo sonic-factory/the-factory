@@ -8,17 +8,30 @@ import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "@common/FactoryErrors.sol";
-import "@common/FactoryEvents.sol";
+import "@common/CommonErrors.sol";
+import "@common/CommonEvents.sol";
 
 contract StandardYieldFarm is 
     Initializable,
     OwnableUpgradeable,
     ReentrancyGuardUpgradeable,
-    FactoryErrors,
-    FactoryEvents
+    CommonErrors,
+    CommonEvents
 {
     using SafeERC20 for IERC20;
+
+    /// @notice Emitted when a user deposits into a yield farm.
+    event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
+    /// @notice Emitted when a user withdraws from a yield farm.
+    event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
+    /// @notice Emitted when a user emergency withdraws from a yield farm.
+    event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
+    /// @notice Emitted when the fee address is set.
+    event SetFeeAddress(address indexed user, address indexed newAddress);
+    /// @notice Emitted when the dev address is set.
+    event SetDevAddress(address indexed user, address indexed newAddress);
+    /// @notice Emitted when the emission rate is updated.
+    event UpdateEmissionRate(address indexed user, uint256 rewardPerSecond);
 
     // Info of each user.
     struct UserInfo {

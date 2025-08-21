@@ -18,11 +18,12 @@ contract StandardERC20Factory is
     Ownable,
     Pausable,
     ReentrancyGuard,
-    FactoryErrors,
-    FactoryEvents,
     CollectorHelper
 {
     using SafeERC20 for IERC20;
+
+    /// @notice Event emitted when a token is created on the platform.
+    event TokenCreated(address indexed token, address indexed owner);
 
     /// @notice Information of each token
     struct TokenInfo {

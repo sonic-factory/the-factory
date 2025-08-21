@@ -4,8 +4,8 @@ pragma solidity 0.8.28;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
 
-import "@common/FactoryErrors.sol";
-import "@common/FactoryEvents.sol";
+import "@common/CommonErrors.sol";
+import "@common/CommonEvents.sol";
 
 /**
  * @title Standard ERC20 Token
@@ -14,10 +14,9 @@ import "@common/FactoryEvents.sol";
 contract StandardERC20 is 
     ERC20BurnableUpgradeable,
     OwnableUpgradeable,
-    FactoryErrors,
-    FactoryEvents
-{    
-    
+    CommonErrors,
+    CommonEvents
+{
     /// @notice Disables the ability to call the initializer
     constructor() {
         _disableInitializers();
