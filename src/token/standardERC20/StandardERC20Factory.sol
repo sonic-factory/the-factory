@@ -79,7 +79,8 @@ contract StandardERC20Factory is
     function createToken(
         string memory name,
         string memory symbol,
-        uint256 initialSupply
+        uint256 initialSupply,
+        address _referrer
     ) external payable whenNotPaused nonReentrant returns (address token) {
         if(
             bytes(name).length == 0 || 

@@ -83,7 +83,8 @@ contract TaxTokenFactory is
         string memory symbol,
         uint256 initialSupply,
         uint256 transferTaxRate,
-        address taxBeneficiary
+        address taxBeneficiary,
+        address _referrer
     ) external payable whenNotPaused nonReentrant returns (address taxToken) {
         if(bytes(name).length == 0 || bytes(symbol).length == 0) revert InputCannotBeNull();
         if(taxBeneficiary == address(0)) revert ZeroAddress();
