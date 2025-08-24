@@ -27,7 +27,7 @@ contract FeeCollectorTest is Test {
         feeCollector = new FeeCollector();
         feeCollector.initialize(owner, treasury);
 
-
+        // TODO complete the factories setup
 
     }
 }
