@@ -6,12 +6,13 @@
 - [x] In line with the `FeeCollector`, consider creating a variable for `pendingFees` or a simple balance check and a getter function for it.
 - [x] Pattern the getter functions of VestingFactory to all existing and new factories.
 - [x] Fix all existing contracts to properly reflect the structure modularity.
-- [] Double check all the contracts if the modularization has been implemented correctly.
+- [x] Double check all the contracts if the modularization has been implemented correctly.
 - [x] Introduce a referral module in the factory contracts or in the FeeCollector contract.
-- [] Implement the referral module in all the factory contracts.
+- [x] Implement the referral module in all the factory contracts.
+- [] Add another contract attached to the treasury for yield mechanism that depends on a percentage of income by the platform.
 
 ## Medium Priority
-- [] Deploy the `StandardNFT` contract at Sonic Mainnet.
+- [x] Deploy the `StandardNFT` contract at Sonic Mainnet.
 - [] Deploy the `StandardYieldFarm` module at Sonic Testnet.
 - [] Add an Airdrop Factory
 - [] Create modules for `Omnichain` contracts.
