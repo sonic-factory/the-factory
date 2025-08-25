@@ -122,7 +122,7 @@ contract MerkleAirdrop is Ownable, ReentrancyGuard {
 
     /// @notice Verifies the merkle proof for a given address and amount.
     function _verifyProof(
-        bytes32[] memory proof,
+        bytes32[] calldata proof,
         address addr,
         uint256 amount
     ) internal view {
